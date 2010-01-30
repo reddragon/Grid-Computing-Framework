@@ -1,0 +1,54 @@
+	<problem>
+	
+	<description>
+			<name> 	   </name>
+		<problemid></problemid>	      <userid>	</userid>		<purpose></purpose>
+		</description>
+
+
+		<tasks>
+			<task>
+				<taskid> </taskid>
+				<taskpriority> 
+
+
+						</taskpriority>
+				<dependencies> 
+					<do></do>
+					<do></do>
+
+				</dependencies>
+				<tasktimeout></tasktimeout>
+				<tasksourcepath> 	</tasksourcepath>
+
+				<taskinputsetpath>	</taskinputsetpath>	
+				
+			<taskcompilecommand>	</taskcompilecommand>
+
+			<taskexecutioncommand> </taskexecutioncommand>
+
+	
+			</task>
+
+			<task>	<taskid> </taskid>
+
+				<taskpriority> </taskpriority>
+				<dependencies> </dependencies>
+
+	<tasktimeout></tasktimeout>
+				<tasksourcepath> 	</tasksourcepath>
+
+				<taskinputsetpath>	</taskinputsetpath>	
+
+				<taskcompilecommand>	</taskcompilecommand>
+
+			<taskexecutioncommand> </taskexecutioncommand>
+	
+			</task>	
+
+		</tasks>
+
+	<rcp> <rcpsourcepath>	</rcpsourcepath> </rcp>
+
+	<emp> <empsourcepath>  	</empsourcepath> </emp>
+</problem>
