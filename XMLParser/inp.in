@@ -1,8 +1,8 @@
 	<problem>
 	
 	<description>
-			<name> 	   </name>
-		<problemid></problemid>	      <userid>	</userid>		<purpose></purpose>
+			<name>MergeSort of a Large Array</name>
+		<problemid>p00001</problemid>	      <userid>Gaurav Menghani</userid>		<purpose>To do a merge sort on a large array</purpose>
 		</description>
 
 
