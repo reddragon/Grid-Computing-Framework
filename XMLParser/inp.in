@@ -9,38 +9,40 @@
 		<tasks>
 			<task>
 				<taskid>t1</taskid>
-				<taskpriority>19</taskpriority>
+				<taskpriority>  19 </taskpriority>
 
 				<dependencies> 
 					<do>t2</do>
 					<do>t3</do>
 
 				</dependencies>
-				<tasktimeout></tasktimeout>
-				<tasksourcepath> 	</tasksourcepath>
+				<tasktimeout>20</tasktimeout>
+				<tasksourcepath>/home/reddragon/t.cpp</tasksourcepath>
 
-				<taskinputsetpath>	</taskinputsetpath>	
+				<taskinputsetpath>/home/reddragon/inp.in</taskinputsetpath>	
 				
-			<taskcompilecommand>	</taskcompilecommand>
+			<taskcompilecommand>g++ -o task task.cpp</taskcompilecommand>
 
-			<taskexecutioncommand> </taskexecutioncommand>
+			<taskexecutioncommand>./task</taskexecutioncommand>
 
 	
 			</task>
 
-			<task>	<taskid> </taskid>
+			<task>	<taskid>t2</taskid>
 
-				<taskpriority> </taskpriority>
-				<dependencies> </dependencies>
+				<taskpriority>2</taskpriority>
+				<dependencies>
+						
+				</dependencies>
 
-	<tasktimeout></tasktimeout>
-				<tasksourcepath> 	</tasksourcepath>
+	<tasktimeout>11</tasktimeout>
+				<tasksourcepath>/home/t2.cpp</tasksourcepath>
 
-				<taskinputsetpath>	</taskinputsetpath>	
+				<taskinputsetpath>/home/reddragon/inp2.in</taskinputsetpath>	
 
-				<taskcompilecommand>	</taskcompilecommand>
+				<taskcompilecommand>g++ -o t2 t2.cpp</taskcompilecommand>
 
-			<taskexecutioncommand> </taskexecutioncommand>
+			<taskexecutioncommand>./t2</taskexecutioncommand>
 	
 			</task>	
 
