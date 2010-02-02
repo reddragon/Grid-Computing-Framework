@@ -8,12 +8,14 @@
 
 		<tasks>
 			<task>
-				<taskid>t1</taskid>
-				<taskpriority>19</taskpriority>
+				<taskid> </taskid>
+				<taskpriority> 
 
+
+						</taskpriority>
 				<dependencies> 
-					<do>t2</do>
-					<do>t3</do>
+					<do></do>
+					<do></do>
 
 				</dependencies>
 				<tasktimeout></tasktimeout>
@@ -46,7 +48,7 @@
 
 		</tasks>
 
-	<rcp> <rcpsourcepath>/home/Documents/Project/rcp.cpp</rcpsourcepath> </rcp>
+	<rcp> <rcpsourcepath>	</rcpsourcepath> </rcp>
 
-	<emp> <empsourcepath>/home/Documents/gcf/emp.cpp</empsourcepath> </emp>
+	<emp> <empsourcepath>  	</empsourcepath> </emp>
 </problem>

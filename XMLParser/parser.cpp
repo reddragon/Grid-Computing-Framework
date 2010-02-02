@@ -3,6 +3,7 @@
 #include<cstring>
 #include<malloc.h>
 #include<iostream>
+#include<sstream>
 
 #include "config.h"
 
@@ -30,35 +31,29 @@ typedef struct ProblemDescripton
 
 typedef struct UnitTask
 {
-	char task_id[40]; 
+	string task_id; 
     	short priority;
 	int total_dependencies;
-	vector<UnitTask> dependencies;
+	vector<string> dependencies;
 	unsigned int timeout;
-	char task_source_path[MAXPATHLENGTH];
-	char task_inputset_path[MAXPATHLENGTH];
+	string task_source_path;
+	string task_inputset_path;
 } UnitTask;
-
-typedef struct TaskSet
-{
-	int total_tasks;
-	vector<UnitTask> UnitTaskList;
-}TaskSet;
 
 typedef struct ResultCompiler
 {
-	char rcp_path[MAXPATHLENGTH];
+	string rcp_path;
 }ResultCompiler;
 
 typedef struct ExecutionMonitor
 {
-	char emp_path[MAXPATHLENGTH];
+	string emp_path;
 }ExecutionMonitor;
 
 typedef struct ParsedXMLElements
 {
 	ProblemDescription Description;
-	TaskSet Tasks;
+	vector<UnitTask> Tasks;
 	ResultCompiler RCP;
 	ExecutionMonitor EMP;
 }ParsedXMLElements;
@@ -424,17 +419,8 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 	
 	pxe->Description.purpose = "";
 	for(; i < xf->file_length; i++)
-		if(xf->file[i] == '<') break;
-		else
-		{
-			if(pxe->Description.purpose.size() > 50)
-			{
+		if(xf->file[i] != ' ') break;
 		
-					//return validate_error(2);
-			}else 
-			pxe->Description.purpose.push_back(xf->file[i]);
-		}
-
 
 		
 	if(i >= xf->file_length) return report_parse_error(12);
@@ -453,7 +439,16 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 
 	/* </purpose> */
 	for(; i < xf->file_length; i++)
-		if(xf->file[i] != ' ') break;
+		if(xf->file[i] == '<') break;
+		else
+		{
+			if(pxe->Description.purpose.size() > 50)
+			{
+		
+					//return validate_error(2);
+			}else 
+			pxe->Description.purpose.push_back(xf->file[i]);
+		}
 		
 	if(i >= xf->file_length) return report_parse_error(13);
 	//printf("%c",xf->file[i+1]);
@@ -486,10 +481,10 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 	i += description_tag_length + 3;
 	/* </description> */
 	
-	cout << pxe->Description.name << endl;
-	cout << pxe->Description.user << endl;
-	cout << pxe->Description.problem_id << endl;
-	cout << pxe->Description.purpose << endl;
+	//cout << pxe->Description.name << endl;
+	//cout << pxe->Description.user << endl;
+	//cout << pxe->Description.problem_id << endl;
+	//cout << pxe->Description.purpose << endl;
 	/* <tasks> */
 	for(; i < xf->file_length; i++)
 		if(xf->file[i] != ' ') break;
@@ -545,7 +540,7 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 				else return report_parse_error(16);
 				i += task_tag_length + 2;
 				/* <task> */	
-				
+				UnitTask ut;	
 				
 				/* <taskid> */
 				for(; i < xf->file_length; i++)
@@ -565,8 +560,18 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 				/* <task> */	
 					
 				/* </taskid> */
-				for(; i < xf->file_length; i++)
-					if(xf->file[i] != ' ') break;
+					ut.task_id = "";
+	for(; i < xf->file_length; i++)
+		if(xf->file[i] == '<') break;
+		else
+		{
+			if(ut.task_id.size() > 40)
+			{	//return validate_error(1); 
+			}
+			
+			ut.task_id.push_back(xf->file[i]);
+		}
+
 		
 				if(i >= xf->file_length) return report_parse_error(19);
 				//printf("%c",xf->file[i+1]);
@@ -601,8 +606,19 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 				/* <taskpriority> */	
 					
 				/* </taskpriority> */
-				for(; i < xf->file_length; i++)
-					if(xf->file[i] != ' ') break;
+				ut.priority = 0;
+				string temp_str = "";
+	for(; i < xf->file_length; i++)
+		if(xf->file[i] == '<') break;
+		else
+		{
+			
+			if(temp_str.size() > 8)
+			{	//return validate_error(1); 
+			}
+			
+			temp_str.push_back(xf->file[i]);
+		}
 		
 				if(i >= xf->file_length) return report_parse_error(21);
 				//printf("%c",xf->file[i+1]);
@@ -675,8 +691,18 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 				/* <do> */	
 					
 				/* </do> */
-				for(; i < xf->file_length; i++)
-					if(xf->file[i] != ' ') break;
+				string temp_dep = "";
+	for(; i < xf->file_length; i++)
+		if(xf->file[i] == '<') break;
+		else
+		{
+			if(temp_dep.size() > 40)
+			{	//return validate_error(1); 
+			}
+			
+			temp_dep.push_back(xf->file[i]);
+		}
+	if(temp_dep !=  "") ut.dependencies.push_back(temp_dep);
 		
 				if(i >= xf->file_length) return report_parse_error(25);
 	
@@ -690,8 +716,6 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 				i += do_tag_length + 3;
 	
 				/* </do> */
-
-
 						for(; i < xf->file_length; i++)
 							if(xf->file[i] != ' ') break;
 
@@ -970,8 +994,18 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 	/* <rcpsourcepath> */
 	
 	/* </rcpsourcepath> */
+	pxe->RCP.rcp_path = "";
 	for(; i < xf->file_length; i++)
-		if(xf->file[i] != ' ') break;
+		if(xf->file[i] == '<') break;
+		else
+		{
+			if(pxe->RCP.rcp_path.size() > MAXPATHLENGTH)
+			{	//return validate_error(1); 
+			}
+			
+			pxe->RCP.rcp_path.push_back(xf->file[i]);
+		}
+
 		
 	if(i >= xf->file_length) return report_parse_error(37);
 	
@@ -1026,7 +1060,8 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
         /* <empsourcepath> */
 	for(; i < xf->file_length; i++)
 		if(xf->file[i] != ' ') break;
-		
+
+			
 	if(i >= xf->file_length) return report_parse_error(40);
 	
 	if(xf->file[i] == '<' && xf->file[i+empsourcepath_tag_length+1] == '>')
@@ -1040,9 +1075,22 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 	/* <empsourcepath> */
 	
 	/* </empsourcepath> */
+			
+	
+	pxe->EMP.emp_path = "";
 	for(; i < xf->file_length; i++)
-		if(xf->file[i] != ' ') break;
-		
+		if(xf->file[i] == '<') break;
+		else
+		{
+			if(pxe->EMP.emp_path.size() > MAXPATHLENGTH)
+			{	//return validate_error(1); 
+			}
+			
+			pxe->EMP.emp_path.push_back(xf->file[i]);
+		}
+	
+
+
 	if(i >= xf->file_length) return report_parse_error(41);
 	
 	if(xf->file[i] == '<' && xf->file[i+1] == '/' && xf->file[i+1+empsourcepath_tag_length+1] == '>')
