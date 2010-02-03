@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 	 printf("Here");
 	 fflush(stdout);
 	 FILE *fp;
-	 fp=fopen("timepass.in","rb");
+	 fp=fopen(argv[2],"rb");
 	 if (fp==NULL) {printf("File error"); exit (1);}
 	 
 	 
@@ -54,6 +54,19 @@ int main(int argc, char *argv[])
      if (newsockfd < 0) 
           error("ERROR on accept");
      
+	 
+	 
+	/* char temp[2];
+	temp[1]='\0';
+     n = read(newsockfd,buffer,255);
+     if (n < 0) error("ERROR reading from socket");
+     printf("Here is the message: %s\n",buffer);*/
+/*	 while(!feof(fp))
+	 {
+		fscanf(fp,"%c",&temp[0]);
+		strcat(buffer,temp);
+	 }
+	 strcat(buffer,"");*/
 	 fseek(fp,0,SEEK_END);
 	 lsize=ftell(fp);
 	 rewind(fp);
