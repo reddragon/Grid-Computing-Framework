@@ -16,6 +16,9 @@ It has the following information with it.
    2.4 Approximate Timeout (optional, but recommended)
    2.5 Task Source File Path
    2.6 Task Input Set Path
+   2.7 Task Output Set Path
+   2.8 Task Compile Command
+   2.9 Task Execution Command
    
 3) Result Compilation Program
    3.1 RCP Source File Path
@@ -47,6 +50,14 @@ The problem schema has to be in the following XML format.
 			</tasksourcepath>
 			<taskinputsetpath>
 			</taskinputsetpath>
+			<taskoutputsetpath>
+			</taskoutputsetpath>
+			<taskcompilecommand>
+			</taskcompilecommand>
+			<taskexecutioncommand>
+			</taskexecutioncommand>
+
+
                 </task>
 	</tasks>
 

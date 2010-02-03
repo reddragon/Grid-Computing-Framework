@@ -4,6 +4,9 @@
 #include<malloc.h>
 #include<iostream>
 #include<sstream>
+#include<set>
+#include<cstring>
+#include<map>
 
 #include "config.h"
 
@@ -33,7 +36,6 @@ typedef struct UnitTask
 	//50 9,10 
     	short priority;
 	//1-100 11
-	//TODO
 	vector<string> dependencies;
 	float timeout;
 	//0.1-1000000000 12
@@ -41,8 +43,10 @@ typedef struct UnitTask
 	//300 13,14
 	string task_inputset_path;
 	//300 15,16
+	string task_outputset_path;
+	//300 21,22
 	string task_compile_command;
-	//300 17,18
+	//300 17,18	
 	string task_execution_command;
 	//300 19,20
 } UnitTask;
@@ -86,33 +90,35 @@ void get_file(XMLFile *xf)
 
 int show_parsed_data(ParsedXMLElements *pxe)
 {
-	cout<<pxe->Description.name << endl;
-	cout<<pxe->Description.user << endl;
-	cout<<pxe->Description.problem_id << endl;
-	cout<<pxe->Description.purpose << endl;
+	cout<<"Problem Name:\t" << pxe->Description.name << endl;
+	cout<<"User:\t" << pxe->Description.user << endl;
+	cout<<"Problem Description:\t" << pxe->Description.problem_id << endl;
+	cout<<"Problem Purpose:\t" << pxe->Description.purpose << endl;
 
 	for(int i = 0; i < (pxe->Tasks.size()); i++)
 	{
-		cout<<pxe->Tasks[i].task_id << endl;
-		cout<<pxe->Tasks[i].priority << endl;
-		cout<<pxe->Tasks[i].timeout << endl;
-		cout<<pxe->Tasks[i].task_source_path << endl;
-		cout<<pxe->Tasks[i].task_inputset_path << endl;
-		cout<<pxe->Tasks[i].task_compile_command << endl;
-		cout<<pxe->Tasks[i].task_execution_command << endl;	
+		cout<<"Task Id:\t" << pxe->Tasks[i].task_id << endl;
+		cout<<"Task Priority:\t" << pxe->Tasks[i].priority << endl;
+		cout<<"Task Timeout:\t" << pxe->Tasks[i].timeout << endl;
+		cout<<"Dependencies: ";
+		for(int j = 0; j < (pxe->Tasks[i].dependencies.size()); j++)
+			cout << pxe->Tasks[i].dependencies[j] << "\t";
 		cout << endl;
+
+		cout<<"Task Source Path:\t" << pxe->Tasks[i].task_source_path << endl;
+		cout<<"Task Input Set Path:\t" << pxe->Tasks[i].task_inputset_path << endl;
+		cout<<"Task Output Set Path:\t" << pxe->Tasks[i].task_outputset_path << endl;
+		cout<<"Task Compile Command:\t" << pxe->Tasks[i].task_compile_command << endl;
+		cout<<"Task Execution Command:\t" << pxe->Tasks[i].task_execution_command << endl << endl;	
 	}
 
-	cout << pxe->RCP.rcp_path << endl;
-	cout << pxe->EMP.emp_path << endl;
+	cout << "RCP Path:\t" << pxe->RCP.rcp_path << endl;
+	cout << "EMP Path:\t" << pxe->EMP.emp_path << endl << endl;
 	return 1;
 
 }
 
-int validate_parsed_data(ParsedXMLElements *pxe)
-{
 
-}
 
 int report_validation_error(short error_number)
 {
@@ -138,12 +144,84 @@ int report_validation_error(short error_number)
 		case 17: strcpy(error, "Task compile command missing."); break;
 		case 18: strcpy(error, "Task compile command longer than 300 characters."); break;
 		case 19: strcpy(error, "Task execution command missing."); break;
-		case 20: strcpy(error, "Task execution command longer than 300 characters."); break;
+		case 20: strcpy(error, "Task execution command longer than 300 characters."); break;	
+		case 21: strcpy(error, "Task output set path missing."); break;
+		case 22: strcpy(error, "Task outputset longer than 300 characters."); break;
+		case 23: strcpy(error, "Task depends on a task, which has not been defined."); break;
+		case 24: strcpy(error, "Deadlock detected in the dependency matrix."); break;
+		//case 20: strcpy(error, "Task execution command longer than 300 characters."); break;
+		//case 20: strcpy(error, "Task execution command longer than 300 characters."); break;
+		
+		
+		
+		
+		
+		
 		//case 2: strcpy(error, "Problem name longer than 100 characters."); break;
 	}
 	printf("%s\n",error);
 	return 1;
 }
+
+
+int validate_parsed_data(ParsedXMLElements *pxe)
+{
+		//TODO
+		/* Validation of files and commands left 
+		   Stripping of leading and following spaces to be done in all fields.
+		*/
+		show_parsed_data(pxe);
+			
+		map<string,int> taskid_index;
+
+		int i, j, k, n = 0;
+		int mat[1000][1000];
+		memset(mat, 0, sizeof(mat));
+
+		for(i = 0; i < pxe->Tasks.size(); i++)
+		{
+			taskid_index[pxe->Tasks[i].task_id] = i+1;
+			n = i+1;
+		}
+
+		for(i = 0; i < pxe->Tasks.size(); i++)
+		{
+			int ti = taskid_index[pxe->Tasks[i].task_id];
+			for(j = 0; j < pxe->Tasks[i].dependencies.size(); j++)
+			{
+				if(taskid_index.find(pxe->Tasks[i].dependencies[j]) == taskid_index.end())
+				{
+					return report_validation_error(23);
+				}
+
+				
+				
+				
+				mat[ti][taskid_index[pxe->Tasks[i].dependencies[j]]] = 1;
+
+			 			}
+				
+		}	
+
+		for(i = 1; i <= n; i++)
+			if(mat[i][j])
+		   for(j = 1; j <= n; j++)
+			for(k = 1; k <= n; k++)
+				if(mat[i][j] == 1 && mat[j][k]== 1)
+				mat[i][k] = 1;
+	
+
+		for(i = 1; i <= n; i++)
+			if(mat[i][i])
+				return report_validation_error(24);
+
+	printf("XML Schema parsed and validated successfully\n");
+	return 1;
+		
+}
+
+
+int i;
 
 
 int report_parse_error(short error_number)
@@ -237,15 +315,21 @@ int report_parse_error(short error_number)
 				break;
 		case 43: strcpy(error, "Improperly formed or missing closing task input set path tag.");
 				break;
+		case 44: strcpy(error, "Improperly formed or missing opening task output set path tag.");
+				break;		
+		case 45: strcpy(error, "Improperly formed or missing closing task output set path tag.");
+				break;
 	}
 
 	printf("%s\n", error);
+	printf("\nAt character: %d\n", i);
 	return 0;
 }
 
 int parse(XMLFile *xf, ParsedXMLElements *pxe)
 {
-	int i, j;
+	int j;
+
 	/*Tags*/
 	char problem_tag[30]; int problem_tag_length;
 	char description_tag[30]; int description_tag_length;
@@ -268,6 +352,7 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 	char rcpsourcepath_tag[30]; int rcpsourcepath_tag_length;
 	char emp_tag[30]; int emp_tag_length;
 	char empsourcepath_tag[30]; int empsourcepath_tag_length;
+	char taskoutputsetpath_tag[30]; int taskoutputsetpath_tag_length;
 
 
 	/*Set Tags*/
@@ -291,8 +376,9 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 	strcpy(rcp_tag, "rcp"); rcp_tag_length = strlen(rcp_tag);
 	strcpy(rcpsourcepath_tag, "rcpsourcepath"); rcpsourcepath_tag_length = strlen(rcpsourcepath_tag);
 	strcpy(emp_tag, "emp"); emp_tag_length = strlen(emp_tag);
-	strcpy(empsourcepath_tag, "empsourcepath"); empsourcepath_tag_length = strlen(empsourcepath_tag);
-
+	strcpy(empsourcepath_tag, "empsourcepath"); empsourcepath_tag_length = strlen(empsourcepath_tag);	
+	strcpy(taskoutputsetpath_tag, "taskoutputsetpath"); taskoutputsetpath_tag_length = strlen(taskoutputsetpath_tag);
+	
 
 
 	/* <problem> */
@@ -942,6 +1028,52 @@ int parse(XMLFile *xf, ParsedXMLElements *pxe)
 				i += taskinputsetpath_tag_length + 3;
 	
 				/* </taskinputsetpath> */	
+
+
+				/* <taskoutputsetpath> */
+			  	for(; i < xf->file_length; i++)
+						if(xf->file[i] != ' ') break;
+		
+				if(i >= xf->file_length) return report_parse_error(44);
+					//i += 1;
+	
+				if(xf->file[i] == '<' && xf->file[i+taskoutputsetpath_tag_length+1] == '>')
+				{
+					for(j = i+1; j < (i+1+taskoutputsetpath_tag_length); j++)
+					if(taskoutputsetpath_tag[j-(i+1)] != xf->file[j])
+						return report_parse_error(44);
+				}
+				else return report_parse_error(44);
+				i += taskoutputsetpath_tag_length + 2;
+				/* <taskoutputsetpath> */	
+					
+				/* </taskoutputsetpath> */
+				ut.task_outputset_path = "";
+				for(; i < xf->file_length; i++)
+					if(xf->file[i] == '<') break;
+					else
+					{
+						if(ut.task_outputset_path.size() > 300)
+						   return report_validation_error(22);
+						ut.task_outputset_path.push_back(xf->file[i]);
+					}
+
+				if(ut.task_outputset_path.size() == 0)
+				   return report_validation_error(21);
+		
+				if(i >= xf->file_length) return report_parse_error(45);
+	
+				if(xf->file[i] == '<' && xf->file[i+1] == '/' && xf->file[i+1+taskoutputsetpath_tag_length+1] == '>')
+				{
+					for(j = i+2; j < (i+2+taskoutputsetpath_tag_length); j++)
+						if(taskoutputsetpath_tag[j-(i+2)] != xf->file[j])
+							return report_parse_error(45);
+				}
+				else return report_parse_error(45);
+				i += taskoutputsetpath_tag_length + 3;
+	
+				/* </taskoutputsetpath> */	
+
 
 				/* <taskcompilecommand> */
 			  	for(; i < xf->file_length; i++)
