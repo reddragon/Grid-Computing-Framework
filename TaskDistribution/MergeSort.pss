@@ -1,0 +1,55 @@
+	<problem>
+	
+	<description>
+			<name>MergeSort of a Large Array</name>
+
+		<problemid>p00001</problemid>	      <userid>Gaurav Menghani</userid>		<purpose>To do a merge sort on a large array</purpose>
+		</description>
+
+
+		<tasks>
+			<task>
+				<taskid>t1</taskid>
+				<taskpriority>19</taskpriority>
+
+				<dependencies> 
+					<do></do>
+
+				</dependencies>
+				<tasktimeout>20</tasktimeout>
+				<tasksourcepath>t1.cpp</tasksourcepath>
+
+				<taskinputsetpath>t1inp.in</taskinputsetpath>	
+				<taskoutputsetpath>t1out.out</taskoutputsetpath>	
+			<taskcompilecommand>g++ -o task1 t1.cpp</taskcompilecommand>
+
+			<taskexecutioncommand>./task1</taskexecutioncommand>
+
+	
+			</task>
+
+			<task>	<taskid>t2</taskid>
+
+				<taskpriority>2</taskpriority>
+				<dependencies>
+						
+				</dependencies>
+
+				<tasktimeout>11</tasktimeout>
+				<tasksourcepath>t2.cpp</tasksourcepath>
+
+				<taskinputsetpath>t2inp.in</taskinputsetpath>
+				<taskoutputsetpath>t2out.out</taskoutputsetpath>	
+
+				<taskcompilecommand>g++ -o t2 t2.cpp</taskcompilecommand>
+
+			<taskexecutioncommand>./t2</taskexecutioncommand>
+	
+			</task>	
+
+		</tasks>
+
+	<rcp> <rcpsourcepath>rcp.cpp</rcpsourcepath> </rcp>
+
+	<emp> <empsourcepath>emp.cpp</empsourcepath> </emp>
+</problem>
