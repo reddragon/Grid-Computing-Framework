@@ -1,0 +1,2 @@
+gcc -Wall -g new.c -o new `pkg-config --cflags gtk+-2.0` \
+`pkg-config --libs gtk+-2.0`
