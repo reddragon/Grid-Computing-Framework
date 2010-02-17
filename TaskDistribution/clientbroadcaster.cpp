@@ -441,7 +441,7 @@ void * command_listener(void * args)
 }
 
 
-void initiate_responder()
+void * initiate_responder(void * args)
 {
 	int sockfd;
         struct addrinfo hints, *servinfo, *p;
@@ -476,7 +476,7 @@ void initiate_responder()
         if ((rv = getaddrinfo(server_address,PORT1, &hints, &servinfo)) != 0) 
 	{
                fprintf(stderr, "Error: %s\n", gai_strerror(rv));
-                return;
+                return NULL;
         }
 
         for(p = servinfo; p != NULL; p = p->ai_next) 
@@ -493,7 +493,7 @@ void initiate_responder()
         if (p == NULL) 
 	{
                  fprintf(stderr, "Error: Failed to bind socket\n");
-                 return;
+                 return NULL;
         }
 	
 	
@@ -571,10 +571,14 @@ int main()
 	close(sockfd);
 	
     initiate_listener();
-    pthread_t command_thread;
-    pthread_create(&command_thread, NULL, &(command_listener), NULL);
-    pthread_join(command_thread, NULL);
-    initiate_responder();
+    pthread_t command_thread, respond_thread;
+    pthread_create(&respond_thread, NULL, &(initiate_responder), NULL);
+
+    //pthread_create(&command_thread, NULL, &(command_listener), NULL);
+    
+    pthread_join(respond_thread, NULL);	
+    //pthread_join(command_thread, NULL);
+    //initiate_responder();
 		
     return 0;
 }
