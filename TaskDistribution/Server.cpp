@@ -5,6 +5,10 @@
 #include "serverlistener.cpp"
 #include "parser.cpp"
 
+
+#define PORT3 "4952"
+
+
 using namespace std;
 
 XMLFile *xf;
@@ -102,15 +106,90 @@ void topo_sort()
 				dep[location[*it]].erase(t);
 	}
 
-	for(i = 0; i < topo_sorted_tasks.size(); i++)
-		cout << topo_sorted_tasks[i] << " " << i << endl;
+	/*for(i = 0; i < topo_sorted_tasks.size(); i++)
+		cout << topo_sorted_tasks[i] << " " << i << endl;*/
 
+
+}
+
+
+bool busy[MAXHOSTS];
+int last_client;
+
+int load_balancer(string s)
+{
+	//TODO
+	/* Proper Load balancing algorithm to be added */
+	for(int i = (last_client + 1) % MAXHOSTS; ; i = (i + 1) % MAXHOSTS)
+	{
+		if(!busy[i] && host_list[i].last_seen != -1)
+			return i;
+	}
+}
+
+int initiate_task_sending(int chosen_host, string t)
+{
+    printf("Asking host %s, to do task %s\n", host_list[chosen_host].host_name, t.c_str());
+    int sockfd;
+    struct addrinfo hints, *servinfo, *p;
+    int rv, numbytes;
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
+
+    if ((rv = getaddrinfo(host_list[chosen_host].host_name,PORT3, &hints, &servinfo)) != 0) 
+    {
+        fprintf(stderr, "Error: %s\n", gai_strerror(rv));
+        return 1;
+    }
+
+    for(p = servinfo; p != NULL; p = p->ai_next) 
+    {
+        if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) 
+	{
+            perror("Error: Could not create socket\n");
+            continue;
+        }
+        break;
+    }
+
+    if (p == NULL) {
+        fprintf(stderr, "Error: Failed to bind socket\n");
+        return 1;
+    }
+	
+    if ((numbytes = sendto(sockfd, t.c_str(), strlen(t.c_str()), 0, p->ai_addr, p->ai_addrlen)) == -1) {
+        perror("Error: Message could not be sent\n");
+        return 1;
+    }
+    freeaddrinfo(servinfo);
+    //printf("Successfully sent the resonse message: %s, to destination: %s\n", r->message, r->host_name);
+	close(sockfd);
+    return 0;
 
 }
 
 void * start_distribution(void * args)
 {
-	topo_sort();	
+
+	topo_sort();
+	int i;
+	//TODO
+	/* Dependencies to be handled. */
+	memset(busy, 0, sizeof(busy));
+	last_client = -1;
+
+	for(i = 0; i < topo_sorted_tasks.size(); i++)
+	{
+		last_client = load_balancer(topo_sorted_tasks[i]);
+		cout << topo_sorted_tasks[i] << " assigned to: " << host_list[last_client].host_name << endl; 
+		busy[last_client] = 1;
+		int res = 1;
+		while(res)
+		  res = initiate_task_sending(last_client, topo_sorted_tasks[i]);
+		
+	}
+
 }
 
 int main()
@@ -119,11 +198,10 @@ int main()
 	pthread_t conn_thread, parse_thread, dist_thread;
 	pthread_create(&conn_thread, NULL, &(start_server), NULL);
 	pthread_create(&parse_thread, NULL, &(parse_file), (void *)(&file));
-	pthread_join(parse_thread, NULL);
 	
 	pthread_create(&dist_thread, NULL, &(start_distribution), NULL);
-	
-	
+	pthread_join(dist_thread,NULL);		
+	pthread_join(parse_thread, NULL);
 	pthread_join(conn_thread, NULL);	
 	return 0;
 }

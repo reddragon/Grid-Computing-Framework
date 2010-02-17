@@ -17,13 +17,16 @@
 /* PORT2 is used for sending by server and listening by client */
 #define PORT2 "4951"
 
+/* PORT 3 is used for sending commands by server and listening by client */
+#define PORT3 "4952"
+
 #define MAXBUFLEN 100
 
 /* Time in microseconds between two client pings to the server */
 #define CLIENTRESPONSETIMEGAP 200000
 
 /* Time within which the server should respond to the client, in seconds and microseconds */
-#define SERVERTIMEOUTSEC 5
+#define SERVERTIMEOUTSEC 4
 #define SERVERTIMEOUTUSEC 0
 
 /* Number of times the client retries to establish a connection with the server */
@@ -339,6 +342,105 @@ int initiate_listener()
 	return 1;
 }
 
+void * command_listener(void * args)
+{
+    int sockfd;
+    struct addrinfo hints, *servinfo, *p;
+    
+    int rv;
+    int numbytes;
+    struct sockaddr_storage their_addr;
+    char buf[MAXBUFLEN];
+    size_t addr_len;
+    char s[INET6_ADDRSTRLEN];
+    fd_set readfds, masterfds;
+    struct timeval timeout;
+    int connretriesleft = CONNECTIONRETRIES;
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC; // set to AF_INET to force IPv4
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_flags = AI_PASSIVE; // use my IP
+	
+    if ((rv = getaddrinfo(NULL, PORT3, &hints, &servinfo)) != 0) 
+	{
+        fprintf(stderr, "Error: %s\n", gai_strerror(rv));
+        return 0;
+    }
+
+    // loop through all the results and bind to the first we can
+    for(p = servinfo; p != NULL; p = p->ai_next) 
+	{
+        if ((sockfd = socket(p->ai_family, p->ai_socktype, 
+			p->ai_protocol)) == -1) 
+		{
+            perror("Error: Could not create socket\n");
+            continue;
+        }
+
+        if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) 
+		{
+            close(sockfd);
+            perror("Error: Failed to bind socket\n");
+            continue;
+        }
+        break;
+    }
+
+    if (p == NULL) 
+    {
+        fprintf(stderr, "Error: Failed to bind socket\n\n");
+        return 0;
+    }
+
+    freeaddrinfo(servinfo);
+    printf("Command Listener Initiated...\n");	
+    addr_len = sizeof their_addr;
+	
+   while(1)
+   {
+             while((connretriesleft--) > 0)
+             {
+         	timeout.tv_sec = SERVERTIMEOUTSEC;
+	        timeout.tv_usec = SERVERTIMEOUTUSEC;
+		FD_ZERO(&masterfds);
+		FD_SET(sockfd, &masterfds);
+
+		memcpy(&readfds, &masterfds, sizeof(fd_set));
+
+		if (select(sockfd+1, &readfds, NULL, NULL, &timeout) < 0)
+		{
+			perror("on select");
+			exit(1);
+		}
+
+		if (FD_ISSET(sockfd, &readfds))
+			break;
+			
+		else
+		{
+			printf("The connection timed out. Attempting again.\n");
+			resend_connection_request();
+			continue;
+		} 
+	     }
+	if(connretriesleft <= 0)
+	{
+		printf("No commands received yet.");
+		continue;
+	}
+	
+	if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,(struct sockaddr *)&their_addr, &addr_len)) == -1) 
+		continue;
+	
+	buf[numbytes] = '\0';
+	printf("Text received: %s\n", buf);
+       }
+	close(sockfd);
+	return NULL;
+}
+
+
 void initiate_responder()
 {
 	int sockfd;
@@ -358,7 +460,7 @@ void initiate_responder()
 	
 	
 	pthread_t thread;
-    pthread_create (&thread, NULL, &(recalculate_metrics), (&nmp));
+    	pthread_create (&thread, NULL, &(recalculate_metrics), (&nmp));
         //pthread_join(thread,NULL);
 	
 	
@@ -468,8 +570,11 @@ int main()
     printf("Successfully sent the broadcast message. Size: %d bytes, Destination: %s\n", numbytes, hostname);
 	close(sockfd);
 	
-	initiate_listener();
-	initiate_responder();
+    initiate_listener();
+    pthread_t command_thread;
+    pthread_create(&command_thread, NULL, &(command_listener), NULL);
+    pthread_join(command_thread, NULL);
+    initiate_responder();
 		
     return 0;
 }
