@@ -2,6 +2,7 @@
 	
 	<description>
 			<name>MergeSort of a Large Array</name>
+
 		<problemid>p00001</problemid>	      <userid>Gaurav Menghani</userid>		<purpose>To do a merge sort on a large array</purpose>
 		</description>
 
@@ -13,14 +14,13 @@
 
 				<dependencies> 
 					<do>t2</do>
-					<do>t3</do>
 
 				</dependencies>
 				<tasktimeout>20</tasktimeout>
 				<tasksourcepath>/home/reddragon/t.cpp</tasksourcepath>
 
 				<taskinputsetpath>/home/reddragon/inp.in</taskinputsetpath>	
-				
+				<taskoutputsetpath>/home/reddragon/out.out</taskoutputsetpath>	
 			<taskcompilecommand>g++ -o task task.cpp</taskcompilecommand>
 
 			<taskexecutioncommand>./task</taskexecutioncommand>
@@ -32,13 +32,16 @@
 
 				<taskpriority>2</taskpriority>
 				<dependencies>
+					
+
 						
 				</dependencies>
 
-	<tasktimeout>11</tasktimeout>
+				<tasktimeout>11</tasktimeout>
 				<tasksourcepath>/home/t2.cpp</tasksourcepath>
 
-				<taskinputsetpath>/home/reddragon/inp2.in</taskinputsetpath>	
+				<taskinputsetpath>/home/reddragon/inp2.in</taskinputsetpath>
+				<taskoutputsetpath>/home/reddragon/out2.out</taskoutputsetpath>	
 
 				<taskcompilecommand>g++ -o t2 t2.cpp</taskcompilecommand>
 

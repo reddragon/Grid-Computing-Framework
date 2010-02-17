@@ -21,34 +21,24 @@ typedef struct XMLFile
 
 typedef struct ProblemDescripton
 {
-	string name; //100 1,2
-	string user; //50 3,4
+	string name; 
+	string user; 
 	string problem_id;
-	//50 5,6
 	string purpose;
-	//400 7,8
 }ProblemDescription;
 
 
 typedef struct UnitTask
 {
 	string task_id;
-	//50 9,10 
     	short priority;
-	//1-100 11
 	vector<string> dependencies;
 	float timeout;
-	//0.1-1000000000 12
 	string task_source_path;
-	//300 13,14
 	string task_inputset_path;
-	//300 15,16
 	string task_outputset_path;
-	//300 21,22
 	string task_compile_command;
-	//300 17,18	
 	string task_execution_command;
-	//300 19,20
 } UnitTask;
 
 typedef struct ResultCompiler
@@ -170,7 +160,7 @@ int validate_parsed_data(ParsedXMLElements *pxe)
 		/* Validation of files and commands left 
 		   Stripping of leading and following spaces to be done in all fields.
 		*/
-		show_parsed_data(pxe);
+		//show_parsed_data(pxe);
 			
 		map<string,int> taskid_index;
 
@@ -215,7 +205,7 @@ int validate_parsed_data(ParsedXMLElements *pxe)
 			if(mat[i][i])
 				return report_validation_error(24);
 
-	printf("XML Schema parsed and validated successfully\n");
+	//printf("XML Schema parsed and validated successfully\n");
 	return 1;
 		
 }
@@ -1403,22 +1393,4 @@ void show_file(XMLFile *xf)
 		putc(xf->file[i],stdout);
 }
 
-int main()
-{
-	XMLFile *xf = new XMLFile;
-	//Handle this
-	if(xf == NULL) return 1;
-	
-	//ParsedXMLElements pxe;
-	ParsedXMLElements *pxe = new ParsedXMLElements;
 
-	strcpy(xf->file_address, "inp.in");
-	get_file(xf);
-	//show_file(xf);
-	
-	parse(xf,pxe);
-	
-	delete xf;
-	delete pxe;
-	return 0;
-}
