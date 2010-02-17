@@ -33,22 +33,14 @@ typedef struct ProblemDescripton
 typedef struct UnitTask
 {
 	string task_id;
-	//50 9,10 
     	short priority;
-	//1-100 11
 	vector<string> dependencies;
 	float timeout;
-	//0.1-1000000000 12
 	string task_source_path;
-	//300 13,14
 	string task_inputset_path;
-	//300 15,16
 	string task_outputset_path;
-	//300 21,22
 	string task_compile_command;
-	//300 17,18	
 	string task_execution_command;
-	//300 19,20
 } UnitTask;
 
 typedef struct ResultCompiler
@@ -114,7 +106,7 @@ int show_parsed_data(ParsedXMLElements *pxe)
 
 	cout << "RCP Path:\t" << pxe->RCP.rcp_path << endl;
 	cout << "EMP Path:\t" << pxe->EMP.emp_path << endl << endl;
-	return 1;
+	return 0;
 
 }
 
@@ -123,6 +115,7 @@ int show_parsed_data(ParsedXMLElements *pxe)
 int report_validation_error(short error_number)
 {
 	char error[200];
+
 	switch(error_number)
 	{
 		case 1: strcpy(error, "Problem name missing."); break;
@@ -216,7 +209,7 @@ int validate_parsed_data(ParsedXMLElements *pxe)
 				return report_validation_error(24);
 
 	printf("XML Schema parsed and validated successfully\n");
-	return 1;
+	return 0;
 		
 }
 
@@ -323,7 +316,7 @@ int report_parse_error(short error_number)
 
 	printf("%s\n", error);
 	printf("\nAt character: %d\n", i);
-	return 0;
+	return 1;
 }
 
 int parse(XMLFile *xf, ParsedXMLElements *pxe)
@@ -1403,6 +1396,7 @@ void show_file(XMLFile *xf)
 		putc(xf->file[i],stdout);
 }
 
+/*
 int main()
 {
 	XMLFile *xf = new XMLFile;
@@ -1421,4 +1415,4 @@ int main()
 	delete xf;
 	delete pxe;
 	return 0;
-}
+}*/
