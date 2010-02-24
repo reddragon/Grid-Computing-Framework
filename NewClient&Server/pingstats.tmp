@@ -1,5 +1,5 @@
-PING 192.168.2.3 (192.168.2.3) 64(92) bytes of data.
+PING 192.168.1.7 (192.168.1.7) 64(92) bytes of data.
 
---- 192.168.2.3 ping statistics ---
+--- 192.168.1.7 ping statistics ---
 2 packets transmitted, 2 received, 0% packet loss, time 999ms
-rtt min/avg/max/mdev = 0.030/0.037/0.044/0.007 ms
+rtt min/avg/max/mdev = 0.016/0.016/0.017/0.004 ms

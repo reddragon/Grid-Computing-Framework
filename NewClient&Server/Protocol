@@ -4,5 +4,5 @@ Server sends commands on Port3
 Client listens for commands on Port3
 Client acknowledges commands on Port4
 Client also request sync for file transfer on Port4
-Client receives files on Port6
-Server receives files on Port7
+Client receives files on Port5
+Server receives files on Port6
