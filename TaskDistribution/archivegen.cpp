@@ -3,9 +3,6 @@
 #include<cstdlib>
 #include<fstream>
 #include "parser.h"
-
-
-
 int main()
 {
 	XMLFile *xf = new XMLFile;
