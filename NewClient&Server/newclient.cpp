@@ -423,7 +423,12 @@ void * ping_the_server(void * args)
                  return NULL;
         }
 	
-	
+	Server pings every 4 seconds on Port1
+Client pings server every 4 seconds on Port2
+Server sends commands on Port3
+Client listens for commands on Port3
+Client acknowledges commands on Port4
+Client also request sync for file transfer on Port4
 	
 	while(1)
 	{	
