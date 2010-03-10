@@ -1451,10 +1451,6 @@ void show_file(XMLFile *xf)
 
 int start_to_parse(XMLFile *xf, ParsedXMLElements *pxe, string pss_file)
 {
-	xf = new XMLFile;
-	if(xf == NULL) return 1;
-	pxe = new ParsedXMLElements;
-	if(pxe == NULL) return 1;
 	strcpy(xf->file_address, (char *)pss_file.c_str());
 	get_file(xf);
 	return parse(xf,pxe);

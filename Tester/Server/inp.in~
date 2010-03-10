@@ -18,13 +18,13 @@
 				</dependencies>
 				<tasktimeout>20</tasktimeout>
 				<networklatencytime>3</networklatencytime>
-				<tasksourcepath>/home/reddragon/t.cpp</tasksourcepath>
+				<tasksourcepath>t1.cpp</tasksourcepath>
 
-				<taskinputsetpath>/home/reddragon/inp.in</taskinputsetpath>	
-				<taskoutputsetpath>/home/reddragon/out.out</taskoutputsetpath>	
-			<taskcompilecommand>g++ -o task task.cpp</taskcompilecommand>
+				<taskinputsetpath>t1_inp.inp</taskinputsetpath>	
+				<taskoutputsetpath>t1_out.out</taskoutputsetpath>	
+			<taskcompilecommand>g++ -o t1 t1.cpp</taskcompilecommand>
 
-			<taskexecutioncommand>./task</taskexecutioncommand>
+			<taskexecutioncommand>./t1</taskexecutioncommand>
 
 	
 			</task>
@@ -39,12 +39,13 @@
 				</dependencies>
 
 				<tasktimeout>11</tasktimeout>
-				<tasksourcepath>/home/t2.cpp</tasksourcepath>
+				<networklatencytime>3</networklatencytime>
+				<tasksourcepath>t2.cpp</tasksourcepath>
 
-				<taskinputsetpath>/home/reddragon/inp2.in</taskinputsetpath>
-				<taskoutputsetpath>/home/reddragon/out2.out</taskoutputsetpath>	
+				<taskinputsetpath>t2_inp2.inp</taskinputsetpath>
+				<taskoutputsetpath>t2_out.out</taskoutputsetpath>	
 
-				<taskcompilecommand>g++ -o t2 t2.cpp</taskcompilecommand>
+				<taskcompilecommand>g++ -o t2 t2.cpp </taskcompilecommand>
 
 			<taskexecutioncommand>./t2</taskexecutioncommand>
 	

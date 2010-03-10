@@ -204,6 +204,13 @@ void * send_file(void * args)
      serv_addr.sin_family = AF_INET;
      serv_addr.sin_addr.s_addr = INADDR_ANY;
      serv_addr.sin_port = htons(atoi(PORT6));
+     int optval;
+     if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+     {
+	   fprintf(stderr, "Failed to set socket options\n");
+	   exit(1);
+    }
+
      if (bind(sockfd, (struct sockaddr *) &serv_addr,
               sizeof(serv_addr)) < 0)
      { 
@@ -328,9 +335,16 @@ int get_server_address()
             perror("Error in get_server_address(): Could not create socket\n");
             continue;
         }
-
-        if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) 
-		{
+	
+      int optval;
+      if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+      {
+	   fprintf(stderr, "Failed to set socket options\n");
+	   exit(1);
+      }
+      
+      if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) 
+      {
             close(sockfd);
             perror("Error: Failed to bind socket\n");
             continue;
@@ -432,11 +446,18 @@ void * check_connection_with_server(void * args)
             perror("Error in check_connection_with_server(): Could not create socket\n");
             continue;
         }
+	
+     int optval;
+     if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+     {
+	   fprintf(stderr, "Failed to set socket options\n");
+	   exit(1);
+     }
 
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) 
 		{
             close(sockfd);
-            perror("Error in check_conenction_with_server(): Failed to bind socket\n");
+            perror("Error in check_connection_with_server(): Failed to bind socket\n");
             continue;
         }
         break;
@@ -684,6 +705,13 @@ void * receive_commands(void * args)
             perror("Error in receive_commands(): Could not create socket\n");
             continue;
         }
+	
+     int optval;
+     if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+     {
+	   fprintf(stderr, "Failed to set socket options\n");
+	   exit(1);
+     }
 
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) 
 		{

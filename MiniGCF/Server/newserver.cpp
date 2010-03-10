@@ -207,7 +207,7 @@ void * receive_file(void * args)
     if (connect(sockfd,(struct sockaddr*)&serv_addr,sizeof(serv_addr)) < 0) 
     {
         printf("Error in connecting");
-	return NULL;
+		return NULL;
     }
 	
    int to_receive = f->file_size;

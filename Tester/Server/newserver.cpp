@@ -19,30 +19,17 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+
 #include "parser.h"
-
-#define PORT1 "6366" 
-#define PORT2 "6367"
-#define PORT3 "6368"
-#define PORT4 "6369"
-#define PORT5 "6370"
-#define PORT6 "6371"
-#define PORT7 "6372"
-
-#define SERVERPINGGAP 400000
-#define MAXBUFLEN 100
-#define MAXHOSTS 200
-#define HOSTCONNTIMEOUT 5
-#define CLEANERSLEEPTIME 500
-#define AUTOCLEANUPTIME 100000
-#define CLIENTTIMEOUT 3
-#define MAXSIZE 10000000
+#include "config.h"
+#include "archiver.h"
 
 using namespace std;
 
 typedef struct node
 {
 	long long time_stamp;
+	int busy;
 	string node_address;
 	double network_metric, performance_metric;
 	
@@ -109,15 +96,21 @@ int get_file_size(string file_name)
 	return lsize;
 }
 
+int sf_sockfd;
+struct sockaddr_in sf_serv_addr;
+bool sf_sock_bound;
 void * send_file(void * args)
 {
+     
      cout << "Ready to send\n" << endl;
      fileinfo *fi = (fileinfo *)args;
      string file_name = fi->file_name, host_name = fi->host_name;
-     int sockfd, newsockfd, portno;
+     int newsockfd, portno;
+     int &sockfd = sf_sockfd;
      socklen_t clilen;
      char *buffer;
-     struct sockaddr_in serv_addr, cli_addr;
+     struct sockaddr_in cli_addr;
+     struct sockaddr_in &serv_addr = sf_serv_addr;	bool command_sent = false;  
      long lsize;
      fflush(stdout);
      FILE *fp;
@@ -140,11 +133,23 @@ void * send_file(void * args)
      serv_addr.sin_family = AF_INET;
      serv_addr.sin_addr.s_addr = INADDR_ANY;
      serv_addr.sin_port = htons(atoi(PORT5));
+     int optval;
+     if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+     {
+	   fprintf(stderr, "Failed to set socket options\n");
+	   exit(1);
+     }
+     
+     
+     //if(!sf_sock_bound)
+     {
+	    sf_sock_bound = true;
      if (bind(sockfd, (struct sockaddr *) &serv_addr,
               sizeof(serv_addr)) < 0)
      { 
               printf("Error in binding socket in send_file()");
 	      exit(1);
+     }
      }
      listen(sockfd,5);
      clilen = sizeof(cli_addr);
@@ -165,12 +170,15 @@ void * send_file(void * args)
      fread(buffer,1,lsize,fp);
      fclose(fp);
      fflush(stdout);
+     cout << "Uptil Here";
      n = write(newsockfd,buffer,lsize);
      if (n < 0) 
      {	     
 	     printf("Error in writing to socket");
 	     return NULL;
      }
+     
+     close(sockfd);
      return NULL; 
 }
 
@@ -312,6 +320,12 @@ void * wait_for_client_response_to_command( void * args )
             perror("Error in wait_for_client_response_to_command(): Could not create socket\n");
             continue;
         }
+    int optval;
+    if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+    {
+	   fprintf(stderr, "Failed to set socket options\n");
+	   exit(1);
+    }
 
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) 
 		{
@@ -355,7 +369,7 @@ void * wait_for_client_response_to_command( void * args )
 
 fileinfo fi;
 
-/*
+
 void * command_coordinator_stub(void * args)
 {
 	pthread_t ccresponse_thread;
@@ -403,9 +417,6 @@ void * command_coordinator_stub(void * args)
 		usleep(500000);
 	}
 	
-	//TODO
-	//The time taken to send the file to the recipient and time taken
-	//to get it back
 	int network_delay = 5, problem_timeout = 20;
 	if(!received_reply) cout << "Did not receive any reply" << endl;
 	else
@@ -445,7 +456,7 @@ void * command_coordinator_stub(void * args)
 	}
 	
 	pthread_join(sender_thread,NULL);
-}*/
+}
 
 
 void * listen_to_client_ping(void * args)
@@ -480,8 +491,14 @@ void * listen_to_client_ping(void * args)
             continue;
         }
        
-       
-        if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+       	int optval;
+        if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+	{
+	   fprintf(stderr, "Failed to set socket options\n");
+	   exit(1);
+	}
+	//TODO
+           if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(sockfd);
             perror("Error in listen_to_client_ping(): Failed to bind socket\n");
             continue;
@@ -528,7 +545,7 @@ void * listen_to_client_ping(void * args)
 				exit(1);
 			}
 			
-			
+				bool command_sent = false;  
 			if(node_map.find(client) != node_map.end())
 			{
 				node_map[client].time_stamp = time(NULL);
@@ -541,6 +558,7 @@ void * listen_to_client_ping(void * args)
 				client_node.time_stamp = time(NULL);
 				client_node.network_metric = nw_metric;
 				client_node.performance_metric = pf_metric;
+				client_node.busy = -1;
 				node_map[client] = client_node;
 			}
 		}	
@@ -614,17 +632,246 @@ void * broadcast_ping(void * args)
 XMLFile *xf;
 ParsedXMLElements *pxe;
 
-void *start(void *args)
+//vector< vector<int> > task_sorted_list;
+map<int,int> task_status;
+int total_tasks_done;
+
+/*
+void do_topo_sort(ParsedXMLElements *pxe)
 {
-	string pss_file = "inp.in";
-	int parse_error = start_to_parse(xf, pxe, pss_file);
-	if(parse_error)
+	//TODO
+	//Do Topo Sort
+	
+	//This is a dummy sort
+	vector<int> r;
+	for(int i = 0; i < (pxe->Tasks.size()); i++)
 	{
-		fprintf(stderr, "Error in parsing PSS File.");
-		exit(1);
+		r.push_back(i);
+		
+	}
+	task_sorted_list.push_back(r);	
+}*/
+
+void init_task_status()
+{
+	for(int i = 0; i < (pxe->Tasks.size()); i++)
+		task_status[i] = TO_BE_DONE;
+}
+
+int get_next_task()
+{	
+	bool processing_tasks = false;
+	for(int i = 0; i < (pxe->Tasks.size()); i++)
+		if(task_status[i] == TO_BE_DONE)
+			return i;
+		else if(task_status[i] == PROCESSING)
+			processing_tasks = true;
+  
+	/*
+		//TODO
+		If no task can be executed yet,
+		return -2
+
+		If no task is available yet, because 
+		they are being executed,
+		return -3
+
+	*/
+	
+	if(processing_tasks == true) 
+		return -3;
+
+	return -1;
+		
+}
+
+string load_balancer(int i)
+{
+	//TODO
+	//Load Balancing Algorithm goes here
+	for(map<string,node>::iterator it = node_map.begin(); it != node_map.end(); it++)
+	{
+		if((it->second).busy == -1)
+			return it->first;	
+	}
+
+	return "";
+}
+
+struct coordinate_task_args
+{
+	string selected_client;
+	int task;
+};
+
+void * coordinate_task(void *arg)
+{
+	coordinate_task_args *cta = (coordinate_task_args *) arg;
+	int task = (cta)->task;
+	
+	string file_name = pxe->Tasks[task].task_id + ".tar.gz";
+	string file_send_command = "COLLECTFILE";
+	int file_size = get_file_size(file_name);
+	command c, filecoord;
+	stringstream ss;
+	ss << file_send_command << " " << file_name << " " << file_size; 
+	c.command_str = ss.str();
+
+	cout << "here" << endl;
+	bool command_sent = false;  
+	string recipient_client = (cta)->selected_client;
+	
+	int wait = 0;
+	string desired_response = "COLLECTFILEACK";
+	pthread_t sender_thread;
+	fi.file_name = file_name;	
+	pthread_create(&sender_thread, NULL, &(send_file), &fi);
+	
+	bool received_reply = false;
+	c.client = recipient_client;
+	send_command_to_client(c);
+	command_sent = true;
+
+	for(int i = 0; i < CFRRETRIES; i++)
+	{
+		if(client_response.find(make_pair(recipient_client,desired_response)) != client_response.end())
+		{
+			received_reply = true;
+			cout << "Received reply from " << recipient_client << endl;
+			client_response.erase(make_pair(recipient_client,desired_response));
+			break;
+		}
+		usleep(CFRTIMEOUT);
+	}
+	int network_delay = pxe->Tasks[task].network_latency_time;
+	int problem_timeout = (pxe->Tasks[task].timeout);
+	if(!received_reply) 
+	{	
+		cout << "Did not receive any reply from " << recipient_client << " to solve " << pxe->Tasks[task].task_id << endl;
+		node_map[cta->selected_client].busy = -1;
+		task_status[cta->task] = TO_BE_DONE;
+
+		return NULL;
+	}
+	else
+	{
+		int timeout = (network_delay + problem_timeout) * 1000000 + 500000;
+		int checks = (int)ceil(timeout*1.0/100000);
+		bool op_recd = false;
+		
+		for(int i = 0; i < checks && !op_recd; i++)
+		{
+			string arg0, arg1;
+			for(set< pair<string,string> >::iterator it = client_response.begin(); it != client_response.end(); it++)
+			{
+				if(it->first != recipient_client) continue;
+				stringstream sst(it->second);
+				sst >> arg0;
+				
+				if(arg0 == "COLLECTRES")
+				{
+				   int file_size;
+				   sst >> arg1 >> file_size;
+					fileinfo rfi;
+					rfi.file_name = arg1; rfi.host_name = recipient_client;
+					rfi.file_size = file_size; 
+					receive_file(&rfi);
+					command collresack;
+					collresack.command_str = "COLLECTRESACK " + arg1;
+					collresack.client = recipient_client;
+					send_command_to_client(collresack);
+					cout << "Yo baby!" << endl;
+					op_recd = true;
+					break;
+				}
+			}
+			usleep(100000);
+		} 
 	}
 	
+	pthread_join(sender_thread,NULL);
 	
+	
+	usleep(1000000);
+	node_map[cta->selected_client].busy = -1;
+	task_status[cta->task] = DONE;
+	return NULL;
+}
+
+void *start(void *args)
+{
+	total_tasks_done = 0;
+	string pss_file = "inp.in";
+	xf = new XMLFile;
+	if(xf == NULL) 
+	{
+		fprintf(stderr, "Failed to allocate memory");
+		exit(1);
+	}
+
+	pxe = new ParsedXMLElements;
+	if(pxe == NULL)
+	{
+		fprintf(stderr, "Failed to allocate memory");
+		exit(1);
+	}
+
+	int parse_error = start_to_parse(xf, pxe, pss_file);	     
+	if(parse_error)
+	{
+		fprintf(stderr, "Problem in parsing PSS File. Terminating.\n");
+		exit(1);
+		
+	}
+	//do_topo_sort(pxe);
+	init_task_status();
+	create_task_archives(xf,pxe);
+	
+	pthread_t ccresponse_thread;
+	pthread_create(&ccresponse_thread, NULL, &(wait_for_client_response_to_command), NULL);
+	sf_sock_bound = true;
+	while(1)
+	{
+		int next_task = get_next_task();
+		//cout << next_task << " here " << endl;
+		if(next_task == -2 || next_task == -3)
+		{
+			do
+			{
+				usleep(500000);
+				next_task = get_next_task();
+			} while(next_task == -2 || next_task == -3);
+		}
+		
+		if(next_task == -1)
+		{	
+			
+			printf("Execution completed.\n");
+			break;
+		}
+
+			
+		string selected_client = "";
+		while(1)
+		{
+			selected_client = load_balancer(next_task);
+			if(selected_client != "") break;
+			usleep(500000);
+		} 
+		
+		cout << next_task << endl;	
+		coordinate_task_args *cta;
+		cta = new coordinate_task_args;
+		cta->selected_client = selected_client;
+		cta->task = next_task;
+		task_status[next_task] = PROCESSING;
+		node_map[selected_client].busy = 1;
+		pthread_t cta_thread;
+		pthread_create(&cta_thread, NULL, &(coordinate_task), cta);
+		
+	}
+	
+	//pthread_join(ccresponse_thread, NULL);
 	delete xf;
 	delete pxe;
 	return NULL;
@@ -633,8 +880,8 @@ void *start(void *args)
 int main()
 {
 	pthread_t ping_thread, listen_to_client_ping_thread, ccstub_thread, start_thread;
-	//pthread_create(&ping_thread, NULL, &(broadcast_ping), NULL);
-	//pthread_create(&listen_to_client_ping_thread, NULL , &(listen_to_client_ping), NULL);
+	pthread_create(&ping_thread, NULL, &(broadcast_ping), NULL);
+	pthread_create(&listen_to_client_ping_thread, NULL , &(listen_to_client_ping), NULL);
 	
 	//pthread_create(&ccstub_thread, NULL, &(command_coordinator_stub), NULL);
 	//pthread_join(ccstub_thread, NULL);

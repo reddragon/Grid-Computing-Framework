@@ -113,6 +113,7 @@ int execute_task(Task *tf)
 	if(pid == 0)
 	{
 		string command = tf->task_execution_command + " < " + tf->task_input_file + " > " + tf->task_output_file;
+		cout << command << endl;
 		rlimit resource_limit;
 		resource_limit.rlim_cur = (int)(ceil(tf->time_limit + 0.1));
 		resource_limit.rlim_max = (int)(ceil(tf->time_limit + 0.1));
