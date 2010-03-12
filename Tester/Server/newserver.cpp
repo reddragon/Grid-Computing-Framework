@@ -99,6 +99,82 @@ int get_file_size(string file_name)
 int sf_sockfd;
 struct sockaddr_in sf_serv_addr;
 bool sf_sock_bound;
+
+
+int ssockfd, sportno, snewsockfd, sn, slsize;
+socklen_t  scli_len;
+struct sockaddr_in sserv_addr, scli_addr;
+
+
+void bind_sf_socket()
+{
+          
+     ssockfd = socket(AF_INET, SOCK_STREAM, 0);
+     if(ssockfd < 0)
+     {
+	     cout << "error!";
+     }
+     bzero((char *)&sserv_addr, sizeof(sserv_addr));
+     sportno = atoi(PORT5);
+     sserv_addr.sin_family = AF_INET;
+     sserv_addr.sin_addr.s_addr = INADDR_ANY;
+     sserv_addr.sin_port = htons(sportno);
+     int optval;
+     
+      if(setsockopt(ssockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+     {
+	   fprintf(stderr, "Failed to set socket options\n");
+	   exit(1);
+     }
+
+     
+     if(bind(ssockfd, (struct sockaddr *) & sserv_addr, sizeof(sserv_addr)) < 0)
+	{
+		cout << "Error in binding "; exit(1);
+	}
+
+}
+
+void * send_file(void *args)
+{
+     bind_sf_socket();
+     fileinfo *fi = (fileinfo *)args;
+     string file_name = fi->file_name, host_name = fi->host_name;
+         
+      listen(ssockfd, 5);
+      scli_len = sizeof(scli_addr);
+      snewsockfd = accept(ssockfd, (struct sockaddr *) &scli_addr, &((scli_len)));
+      if(snewsockfd < 0)
+      {
+	      cout << "Error in accepting"; exit(1);
+      }
+
+      FILE *fp;
+     fp=fopen(file_name.c_str(),"rb");
+	int lsize, n;
+     fseek(fp,0,SEEK_END);
+     lsize=ftell(fp);
+     rewind(fp);
+     char *buffer;	 
+     buffer=(char *)malloc(sizeof(char)*lsize); 
+     fread(buffer,1,lsize,fp);
+     fclose(fp);
+     fflush(stdout);
+     n = write(snewsockfd,buffer,lsize);
+     if (n < 0) 
+     {	     
+	     printf("Error in writing to socket");
+	     return NULL;
+     }
+      free(buffer);
+      //close(sockfd);
+      //unlink(sockfd);
+      close(ssockfd);
+      return NULL;
+}
+
+
+/*
 void * send_file(void * args)
 {
      
@@ -134,16 +210,23 @@ void * send_file(void * args)
      serv_addr.sin_addr.s_addr = INADDR_ANY;
      serv_addr.sin_port = htons(atoi(PORT5));
      int optval;
+    
+     
+      
+        	cout << "Here inside " << endl; 	     
      if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
      {
 	   fprintf(stderr, "Failed to set socket options\n");
 	   exit(1);
      }
+          
      
-     
-     //if(!sf_sock_bound)
+     if(!sf_sock_bound)
      {
-	    sf_sock_bound = true;
+     sf_sock_bound = true;
+     
+     //cout << bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) << " --- " << endl; 
+     
      if (bind(sockfd, (struct sockaddr *) &serv_addr,
               sizeof(serv_addr)) < 0)
      { 
@@ -170,7 +253,6 @@ void * send_file(void * args)
      fread(buffer,1,lsize,fp);
      fclose(fp);
      fflush(stdout);
-     cout << "Uptil Here";
      n = write(newsockfd,buffer,lsize);
      if (n < 0) 
      {	     
@@ -178,9 +260,10 @@ void * send_file(void * args)
 	     return NULL;
      }
      
-     close(sockfd);
+     //close(sockfd);
+     cout << "Closed the socket" << endl;
      return NULL; 
-}
+}*/
 
 void * receive_file(void * args)
 {
@@ -231,6 +314,9 @@ void * receive_file(void * args)
    fclose(fp); 
    return NULL;
 }
+
+
+
 
 struct command
 {
@@ -829,7 +915,7 @@ void *start(void *args)
 	
 	pthread_t ccresponse_thread;
 	pthread_create(&ccresponse_thread, NULL, &(wait_for_client_response_to_command), NULL);
-	sf_sock_bound = true;
+	sf_sock_bound = false;
 	while(1)
 	{
 		int next_task = get_next_task();

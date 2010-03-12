@@ -42,7 +42,7 @@
 				<networklatencytime>3</networklatencytime>
 				<tasksourcepath>t2.cpp</tasksourcepath>
 
-				<taskinputsetpath>t2_inp2.inp</taskinputsetpath>
+				<taskinputsetpath>t2_inp.inp</taskinputsetpath>
 				<taskoutputsetpath>t2_out.out</taskoutputsetpath>	
 
 				<taskcompilecommand>g++ -o t2 t2.cpp </taskcompilecommand>

@@ -123,7 +123,10 @@ int execute_task(Task *tf)
 		printf("Executing\n");
 		freopen((char *)(tf->task_input_file).c_str(), "r", stdin);
 		freopen((char *)(tf->task_output_file).c_str(), "w", stdout);
-		execlp("./task1", "./task1", (char *)0);
+		system( (char *)command.c_str());
+		//execlp((char *)(tf->task_execution_command).c_str(), (char *)(tf->task_execution_command).c_str(), (char *)0);
+		
+		//execlp("./task1", "./task1", (char *)0);
 		exit(0);		
 	}
 	else

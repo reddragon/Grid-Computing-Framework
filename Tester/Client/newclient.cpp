@@ -21,7 +21,7 @@
 #define PORT2 "6367"
 #define PORT3 "6368"
 #define PORT4 "6369"
-#define PORT5 "6370"
+#define PORT5 "6380"
 #define PORT6 "6371"
 #define PORT7 "6372"
 #define CONNECTIONRETRIES 10
@@ -173,75 +173,77 @@ int get_file_size(string file_name)
 	return lsize;
 }
 
+int ssockfd, sportno, snewsockfd, sn, slsize;
+socklen_t  scli_len;
+struct sockaddr_in sserv_addr, scli_addr;
 
-void * send_file(void * args)
+
+void bind_sf_socket()
 {
-     fileinfo *fi = (fileinfo *)args;
-     string file_name = fi->file_name, host_name = fi->host_name;
-     int sockfd, newsockfd, portno;
-     socklen_t clilen;
-     char *buffer;
-     struct sockaddr_in serv_addr, cli_addr;
-     long lsize;
-     fflush(stdout);
-     FILE *fp;
-     fp=fopen(file_name.c_str(),"rb");
-     if (fp==NULL) 
-     { 
-		printf("Error in reading file in send_file()."); 
-		exit (1);
+          
+     ssockfd = socket(AF_INET, SOCK_STREAM, 0);
+     if(ssockfd < 0)
+     {
+	     cout << "error!";
      }
-	 
-     int n;
-     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-     if (sockfd < 0)
-     { 
-        printf("Error in opening socket");
-    	exit(0); 
-     }
-     bzero((char *) &serv_addr, sizeof(serv_addr));
-     
-     serv_addr.sin_family = AF_INET;
-     serv_addr.sin_addr.s_addr = INADDR_ANY;
-     serv_addr.sin_port = htons(atoi(PORT6));
+     bzero((char *)&sserv_addr, sizeof(sserv_addr));
+     sportno = atoi(PORT5);
+     sserv_addr.sin_family = AF_INET;
+     sserv_addr.sin_addr.s_addr = INADDR_ANY;
+     sserv_addr.sin_port = htons(sportno);
      int optval;
-     if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+     
+      if(setsockopt(ssockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
      {
 	   fprintf(stderr, "Failed to set socket options\n");
 	   exit(1);
-    }
-
-     if (bind(sockfd, (struct sockaddr *) &serv_addr,
-              sizeof(serv_addr)) < 0)
-     { 
-              printf("Error in binding socket in send_file()");
-	      exit(1);
-     }
-     listen(sockfd,5);
-     clilen = sizeof(cli_addr);
-     newsockfd = accept(sockfd, 
-                 (struct sockaddr *) &cli_addr, 
-                 &clilen);
-     if (newsockfd < 0) 
-     {
-          printf("Error in accepting connection in send_file()");
-	  return NULL;
      }
 
-     lsize = fi->file_size;
-     	 
+     
+     if(bind(ssockfd, (struct sockaddr *) & sserv_addr, sizeof(sserv_addr)) < 0)
+	{
+		cout << "Error in binding "; exit(1);
+	}
+
+}
+
+void * send_file(void *args)
+{
+      bind_sf_socket();
+      fileinfo *fi = (fileinfo *)args;
+      string file_name = fi->file_name, host_name = fi->host_name;
+         
+      listen(ssockfd, 5);
+      scli_len = sizeof(scli_addr);
+      snewsockfd = accept(ssockfd, (struct sockaddr *) &scli_addr, &((scli_len)));
+      if(snewsockfd < 0)
+      {
+	      cout << "Error in accepting"; exit(1);
+      }
+
+      FILE *fp;
+     fp=fopen(file_name.c_str(),"rb");
+	int lsize, n;
+     fseek(fp,0,SEEK_END);
+     lsize=ftell(fp);
+     rewind(fp);
+     char *buffer;	 
      buffer=(char *)malloc(sizeof(char)*lsize); 
      fread(buffer,1,lsize,fp);
      fclose(fp);
      fflush(stdout);
-     n = write(newsockfd,buffer,lsize);
+     n = write(snewsockfd,buffer,lsize);
      if (n < 0) 
      {	     
 	     printf("Error in writing to socket");
 	     return NULL;
      }
-     return NULL; 
+      free(buffer);
+      close(ssockfd);
+      return NULL;
 }
+
+
 
 void * receive_file(void * args)
 {
@@ -807,6 +809,7 @@ void * receive_commands(void * args)
 		}
   
   }
+  //cout << "Done" << endl;
 	freeaddrinfo(servinfo);
 	close(sockfd);
 
