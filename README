@@ -1,0 +1,21 @@
+This is the Git Repository for the Grid Computing Framework.
+
+Goals of this framework are to provide an
+
+	* easy to use,
+	* easy to deploy, and
+	* easy to maintain moderate sized grid.
+
+Currently the following features are left before a stable version is released:
+
+1. Implementing the Load Balancing Algorithm, currently the Genetic Simulated Annealing (GSA) algorithm is the most suitable candidate.
+
+2. Completing the Fault-Tolerance features.
+
+3. Interfacing with the GUI (ready, but to be linked).
+
+4. Completing the Execution Monitor Program.
+
+
+GCF is expected to be completed by 24th April, 2009.
+
