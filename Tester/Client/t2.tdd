@@ -1,0 +1,7 @@
+t2
+g++ -o t2 t2.cpp 
+./t2
+t2_inp.inp
+t2_out.out
+2
+11

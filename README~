@@ -1,3 +1,4 @@
+<<<<<<< HEAD:README~
 This is the Git Repository for the Grid Computing Framework.
 
 Goals of this framework are to provide an
@@ -8,3 +9,8 @@ Goals of this framework are to provide an
 
 
 
+=======
+Grid Computing Framework (GCF)
+
+The grid computing framework.
+>>>>>>> bf71ce7693534aa028d4905ab64dbc0ea52bd746:README~

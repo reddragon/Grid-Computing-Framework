@@ -1,0 +1,74 @@
+Problem Solving Schema
+----------------------
+
+It has the following information with it.
+1) Problem Description (optional, but recommended).
+   1.1 Name of the Problem
+   1.2 Problem ID
+   1.3 Name of the User
+   1.4 Purpose
+   
+2) Task Files
+   For each task,
+   2.1 Task Id
+   2.2 Task Priority
+   2.3 Dependencies
+   2.4 Approximate Timeout
+   2.5 Network Latency Time
+   2.6 Task Source File Path
+   2.7 Task Input Set Path
+   2.8 Task Output File Name
+   2.9 Task Source File Compilation Command
+   2.10 Task Execution Command
+3) Result Compilation Program
+   3.1 RCP Source File Path
+4) Execution Manager Program (optional, but recommended)
+   4.1 EMP Source File Path
+
+
+The problem schema has to be in the following XML format.
+
+<problem>
+	<description>
+			<name></name>
+    			<problemid></problemid>
+			<user></user>
+			<purpose></purpose>
+	</description>
+
+	<tasks>
+		<task>
+			<taskid></taskid>
+			<taskpriority></taskpriority>
+			<dependencies>	
+					<do>TaskID</do>
+			<dependencies>
+			<tasktimeout>
+			</tasktimeout>
+			<networklatencytime>
+			</networklatencytime>
+			<tasksourcepath>
+			</tasksourcepath>
+			<taskinputsetpath>
+			</taskinputsetpath>
+			<taskcompilecommand>
+			</taskcompilecommand>
+			<taskexecutioncommand>
+			</taskexecutioncommand>
+                </task>
+	</tasks>
+
+	
+	
+	<rcp>
+		<rcpsourcepath>
+		</rcpsourcepath>
+	</rcp>
+
+	<emp>
+		<empsourcepath>
+		</empsourcepath>
+	</emp>
+</problem>
+
+The PSS is used by the Grid Computing Framework, to collect the components and tools it needs to solve the problem. The data in the PSS should be thoroughly checked before submitting the PSS.
