@@ -1,5 +1,0 @@
-t1
-g++ -o task1 t1.cpp
-./task1
-19
-20

@@ -1,7 +1,0 @@
-t1
-g++ -o task1 t1.cpp
-./task1
-t1_inp.inp
-t1_out.out
-19
-20

@@ -1,5 +1,0 @@
-PING 192.168.1.8 (192.168.1.8) 64(92) bytes of data.
-
---- 192.168.1.8 ping statistics ---
-1 packets transmitted, 1 received, 0% packet loss, time 0ms
-rtt min/avg/max/mdev = 0.015/0.015/0.015/0.000 ms
