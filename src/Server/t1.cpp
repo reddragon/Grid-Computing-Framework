@@ -1,3 +1,10 @@
+/* This is an example task program.
+ * This program along with the input set and
+ * other files like t1.tdd, etc.
+ * would be send to the client, which will
+ * then compile and execute it and send the
+ * results back */
+
 #include<iostream>
 #include<cstdio>
 #include<algorithm>
