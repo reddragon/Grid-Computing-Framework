@@ -455,7 +455,7 @@ void * ping_the_server(void * args)
 	printf("Calculating performance metric..\n");
 	pf_metric = performance_metric();
 	printf("Performance metric calculated.\n");
-    printf("Metrics calculated. Performance Metric: %lf  Network Metric: %lf\n", pf_metric, nw_metric);
+        printf("Metrics calculated. Performance Metric: %lf  Network Metric: %lf\n", pf_metric, nw_metric);
 
 	
 	struct nw_metric_params nmp;
@@ -465,9 +465,9 @@ void * ping_the_server(void * args)
 	strcpy(nmp.server_add , server_address);
 	
 	
-		pthread_t thread;
-		pthread_create (&thread, NULL, &(recalculate_metrics), (&nmp));
-	    memset(&hints, 0, sizeof hints);
+	pthread_t thread;
+	pthread_create (&thread, NULL, &(recalculate_metrics), (&nmp));
+	memset(&hints, 0, sizeof hints);
         hints.ai_family = AF_UNSPEC;
         hints.ai_socktype = SOCK_DGRAM;
 

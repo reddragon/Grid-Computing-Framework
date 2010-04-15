@@ -108,22 +108,20 @@ int send_file(void *args)
      int to_do = lsize;
      int mov_ptr = 0;
 	 
-	 struct timeval tv;
-	 tv.tv_sec = CLIENTTIMEOUT ;
-	 tv.tv_usec = 1;
-	 fd_set writefds;
-	 FD_ZERO(&writefds);
-	 FD_SET(snewsockfd,&writefds);
-	 if(select(snewsockfd+1,NULL,&writefds,NULL,&tv) == -1 )
-	 {
+     struct timeval tv;
+     tv.tv_sec = CLIENTTIMEOUT ;
+     tv.tv_usec = 1;
+     fd_set writefds;
+     FD_ZERO(&writefds);
+      FD_SET(snewsockfd,&writefds);
+      if(select(snewsockfd+1,NULL,&writefds,NULL,&tv) == -1 )
+      {
 			//Time out on a socket
 			cout << "Timed out on the socket" << endl;
 			return 1;
-	 }
-	
-	signal(SIGPIPE, SIGPIPE_handler);
+      }
 	 
-     do
+    do
     {
       n = write(snewsockfd,buffer + mov_ptr,to_do);
       

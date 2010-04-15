@@ -118,8 +118,6 @@ int send_file(void *args)
      int to_do = lsize;
      int mov_ptr = 0;
 	 
-	cout << "Planning to write now.." << endl;
-	signal(SIGPIPE, SIGPIPE_handler);
 	 
      do
     {
@@ -150,14 +148,14 @@ void * receive_file(void * args)
     struct hostent *server;
 		
     char *buffer = new char[MAXSIZE];
-   	if(buffer == 0)
-	{
-		cout << "Error in allocation";
-		return NULL;
-	}
+    if(buffer == 0)
+    {
+	cout << "Error in allocation";
+	return NULL;
+    }
     memset(buffer, 0, sizeof(buffer));
 
-	FILE *fp;
+    FILE *fp;
     fp=fopen(file_name.c_str(),"wb");
 	
     portno = atoi(PORT5);
@@ -169,7 +167,7 @@ void * receive_file(void * args)
     }
     server = gethostbyname(host_name.c_str());
     if (server == NULL) 
-	{
+    {
         fprintf(stderr,"Error, no such host\n");
         exit(1);
     }
@@ -180,16 +178,16 @@ void * receive_file(void * args)
          server->h_length);
     serv_addr.sin_port = htons(portno);
     
-	int retries = 0;
+    int retries = 0;
     int wait_sec = 50;
     
-	while (connect(sockfd,(struct sockaddr*)&serv_addr,sizeof(serv_addr)) < 0) 
+   while (connect(sockfd,(struct sockaddr*)&serv_addr,sizeof(serv_addr)) < 0) 
     {
         if(wait_sec == 0)
-		{
+	{
 			printf("Error in connecting");
 			return NULL;
-		}
+	}
 	else { wait_sec--; usleep(100000); }
     }
  

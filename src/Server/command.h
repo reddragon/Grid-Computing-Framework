@@ -31,7 +31,7 @@ sem_t sc_sem;
 void send_command_to_client(command arg)
 {
 	int sockfd;
-    struct addrinfo hints, *servinfo, *p;
+        struct addrinfo hints, *servinfo, *p;
 	int rv, numbytes, optval = 1;
 	char messagebuffer[500];
 	
@@ -40,13 +40,13 @@ void send_command_to_client(command arg)
         hints.ai_socktype = SOCK_DGRAM;
 
         if ((rv = getaddrinfo(arg.client.c_str(),PORT3, &hints, &servinfo)) != 0) 
-		{
+	{
                fprintf(stderr, "Error in send_command_to_client: %s\n", gai_strerror(rv));
                exit(1);
         }
 
         for(p = servinfo; p != NULL; p = p->ai_next) 
-	    {
+	{
             if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) 
         	{
                     perror("Error in send_command_to_client(): Could not create socket\n");
@@ -56,7 +56,7 @@ void send_command_to_client(command arg)
        }
 	
         if (p == NULL) 
-		{
+	{
                  fprintf(stderr, "Error in send_command_to_client(): Failed to bind socket\n");
                  exit(1);
         }	
