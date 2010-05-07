@@ -1,0 +1,35 @@
+$ cat control
+Package: parted
+Version: 1.4.24-4
+Section: admin
+Priority: optional
+Architecture: i386
+Depends: e2fsprogs (>= 1.27-2), libc6 (>= 2.2.4-4), libncurses5 (>= \
+5.2.20020112a-1), libparted1.4 (>= 1.4.13+14pre1), libreadline4 (>= \
+4.2a-4), libuuid1
+Suggests: parted-doc
+Conflicts: fsresize
+Replaces: fsresize
+Installed-Size: 76
+Maintainer: Timshel Knoll <timshel@debian.org>
+Description: The GNU Parted disk partition resizing program
+ GNU Parted is a program that allows you to create, destroy,
+ resize, move and copy hard disk partitions. This is useful
+ for creating space for new operating systems, reorganizing
+ disk usage, and copying data to new hard disks.
+ .
+ This package contains the Parted binary and manual page.
+ .
+ Parted currently supports DOS, Mac, Sun, BSD, GPT and PC98
+ disklabels/partition tables, as well as a 'loop' (raw disk)
+ type which allows use on RAID/LVM. Filesystems supported are
+ ext2, ext3, FAT (FAT16 and FAT32) and linux-swap. Parted can
+ also detect HFS (Mac OS), JFS, NTFS, ReiserFS, UFS and XFS
+ filesystems, but cannot create/remove/resize/check these
+ filesystems yet.
+ .
+ The nature of this software means that any bugs could cause
+ massive data loss. While there are no known bugs at the moment,
+ they could exist, so please back up all important files before
+ running it, and do so at your own risk.
+

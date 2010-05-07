@@ -1,0 +1,28 @@
+<emp>
+	<emptimeout>
+	</emptimeout>
+	
+	<checkpoints>
+		<task>
+		</task>
+	</checkpoint>
+	
+	<executioncommands>
+		<command>
+		</command>
+	</executioncommands>
+	
+	
+</emp>
+
+IPC happens through the shared memory concept. GCF writes to a file "tasks_done.emp" telling which all tasks have been done. EMP needs to read this and write data to "emp_response.emp". GCF suspends any further task execution until data is read from that file.
+
+Commands:
+CONTINUE
+STOPALL
+STOP task
+SUSPENDALL
+SUSPEND task
+RESUMEALL
+RESUME task
+

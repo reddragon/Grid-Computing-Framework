@@ -1,0 +1,12 @@
+t1
+1
+g++ -o t1 t1.cpp
+./t1
+1
+t1_inp.inp
+1
+t1_out.out
+19
+1
+1
+t1.cpp

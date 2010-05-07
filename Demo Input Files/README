@@ -1,0 +1,1 @@
+Copy the supervisor binary into the folder where your input files are. On the Worker Node side, wherever the worker binary is, some files will be created, so make sure you have permissions to write at that place.
