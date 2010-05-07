@@ -18,9 +18,23 @@ struct command
 };
 
 char supervisor_address[100];
+float nice_val=0,cpu_use=0;
 char rec_window[200];
 Task curr;
 
+
+
+
+void cpu_usage()
+{
+	sg_cpu_percents *cpu_percent;
+	sg_init();
+	sg_snapshot();
+	cpu_percent = sg_get_cpu_percents();
+
+	nice_val=cpu_percent->nice;
+	cpu_use=100.0-cpu_percent->idle;
+}
 
 void send_to_command_view(string str)
 {	

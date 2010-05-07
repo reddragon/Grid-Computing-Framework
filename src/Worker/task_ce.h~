@@ -10,7 +10,6 @@
 #include <cmath>
 #include <sys/times.h>
 #include <sys/time.h>
-#include <statgrab.h>
 
 #include "interface.h"
 
@@ -24,29 +23,12 @@ struct Task
 	int priority; float time_limit;
 };
 
-float nice_val = 0, cpu_use = 0;
-char to_send[100];
-
 void send_to_command_view2(string str)
 {	
 	set_command_view((char *)str.c_str());		
 }
 
-
-void cpu_usage()
-{
-	sg_cpu_percents *cpu_percent;
-	sg_init();
-	sg_snapshot();
-	cpu_percent = sg_get_cpu_percents();
-
-	nice_val = cpu_percent->nice;
-	cpu_use = 100.0 - cpu_percent->idle;
-}
-
-
-
-
+char to_send[100];
 
 int wrap_up()
 {
@@ -383,7 +365,8 @@ int task_ce(string tid, Task &tf)
 	
 	char string_to_exec[200];
 	cpu_usage();
-	sprintf(string_to_exec,"Task ID: %s\nTask Priority: %d\nTask Limit: %.2lf\nCPU Nice: %.2f\nCPU Busy: %.2f\n",tf.task_id.c_str(),tf.priority,tf.time_limit,nice_val,cpu_use);
+	read_tdd(curr,task);
+	sprintf(string_to_exec,"Task ID: %s\nTask Priority: %d\nTask Limit: %.2lf\nCPU Nice: %.2f\nCPU Busy: %.2f\n",task.c_str(),curr.priority,curr.time_limit,nice_val,cpu_use);
 	set_execution_view(string_to_exec);
 	
 	int cret, eret;

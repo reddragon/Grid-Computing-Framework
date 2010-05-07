@@ -182,7 +182,7 @@ create_window3 (void)
 
   window3 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_set_size_request (window3, 600, 400);
-  gtk_window_set_title (GTK_WINDOW (window3), _("Supervisor Execution"));
+  gtk_window_set_title (GTK_WINDOW (window3), _("Grid Computing Framework : Supervisor"));
   gtk_window_set_destroy_with_parent (GTK_WINDOW (window3), TRUE);
 
   notebook1 = gtk_notebook_new ();
@@ -193,7 +193,7 @@ create_window3 (void)
   gtk_widget_show (vbox7);
   gtk_container_add (GTK_CONTAINER (notebook1), vbox7);
 
-  label7 = gtk_label_new (_("<b>Complete Overview of Tasks</b>"));
+  label7 = gtk_label_new (_("<b>Overview of Problem Execution</b>"));
   gtk_widget_show (label7);
   gtk_box_pack_start (GTK_BOX (vbox7), label7, FALSE, FALSE, 0);
   gtk_label_set_use_markup (GTK_LABEL (label7), TRUE);
@@ -223,7 +223,7 @@ create_window3 (void)
   gtk_widget_show (vbox8);
   gtk_container_add (GTK_CONTAINER (notebook1), vbox8);
 
-  label8 = gtk_label_new (_("<b>Information of Tasks</b>"));
+  label8 = gtk_label_new (_("<b>Task Execution Details</b>"));
   gtk_widget_show (label8);
   gtk_box_pack_start (GTK_BOX (vbox8), label8, FALSE, FALSE, 0);
   gtk_label_set_use_markup (GTK_LABEL (label8), TRUE);
@@ -250,7 +250,7 @@ create_window3 (void)
   gtk_widget_show (vbox11);
   gtk_container_add (GTK_CONTAINER (notebook1), vbox11);
 
-  label12 = gtk_label_new (_("<b>Click on a worker to view its status</b>"));
+  label12 = gtk_label_new (_("<b>Click on a worker to see its status</b>"));
   gtk_widget_show (label12);
   gtk_box_pack_start (GTK_BOX (vbox11), label12, FALSE, FALSE, 0);
   gtk_label_set_use_markup (GTK_LABEL (label12), TRUE);
@@ -273,11 +273,11 @@ create_window3 (void)
   gtk_container_add (GTK_CONTAINER (scrolledwindow7), textview7);
   gtk_text_view_set_editable (GTK_TEXT_VIEW (textview7), FALSE);
 
-  display_client = gtk_button_new_with_mnemonic (_("Display Worker Information"));
+  display_client = gtk_button_new_with_mnemonic (_("Display Worker Node Information"));
   gtk_widget_show (display_client);
   gtk_box_pack_start (GTK_BOX (vbox11), display_client, FALSE, FALSE, 0);
 
-  label4 = gtk_label_new (_("<b>Worker Information</b>"));
+  label4 = gtk_label_new (_("<b>Worker Status</b>"));
   gtk_widget_show (label4);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook1), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook1), 2), label4);
   gtk_label_set_use_markup (GTK_LABEL (label4), TRUE);
@@ -288,7 +288,6 @@ create_window3 (void)
   gtk_widget_show (label10);
   gtk_container_add (GTK_CONTAINER (notebook1), label10);
   gtk_label_set_use_markup (GTK_LABEL (label10), TRUE);
-  //gtk_label_set_justify (GTK_LABEL (label10), GTK_JUSTIFY_CENTER);
 
   label5 = gtk_label_new (_("<b>About Us</b>"));
   gtk_widget_show (label5);
