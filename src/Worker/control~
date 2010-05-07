@@ -1,9 +1,0 @@
-Package: gcfworker
-Version: 1.1
-Section: base
-Priority: optional
-Architecture: all
-Depends: libstatgrab (>=0.17)
-Maintainer: Group 33 <gridcomputingframework@gmail.com>
-Description: Grid Computing Framework
- This binary is the client section of the Grid Computing Framework.
